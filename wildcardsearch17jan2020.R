@@ -21,8 +21,9 @@ attach(bees)
 newdata <- bees[ which(bees$recordedBy==str_detect(bees,'UCSBees*')),]
 newdata
 #use bee
-newdata %>% 
-  filter(bees, str_detect(tolower(recordedBy), pattern = "ucsbees"))
+
+newdata <- filter(bees, str_detect(recordedBy), pattern = "UCSBees")
+
 ?str_detect
 newdata
 head(newdata)
