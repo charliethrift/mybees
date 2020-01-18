@@ -1,17 +1,39 @@
-#####################################
-### Apis melifera prelim analyses ###
-#####################################
+########################################
+### Wild card search for all UCSBees ###
+########################################
 
 # libraries
 library(tidyverse)
+library(dplyr)
 
 # download data
-#this is the Honey bee only data
-bees1 <- read.csv(file = "my_project/data/apisdatanov14new4.csv")
-bees1
+#this is all of the hymenoptera data from CCBER gbif site
+bees <- read.csv(file = "beedata17jan2020.csv", sep = "\t")
+bees
+#use wild cards to only see UCSBees lines within 
+#all of the hymenoptera
+attach(bees)
+newdata <- bees[ which(bees$recordedBy=='UCSBees Survey'),]
+newdata
+
+#figure out how to use the wildcard
+attach(bees)
+newdata <- bees[ which(bees$recordedBy==str_detect(bees,'UCSBees*')),]
+newdata
+#use bee
+newdata %>% 
+  filter(bees, str_detect(tolower(recordedBy), pattern = "ucsbees"))
+?str_detect
+newdata
+head(newdata)
+#to check what is in the recordedBy column
+unique(bees$recordedBy)
+
+#to clear environment
+rm(list=ls())
+
 
 # visualizing data
-
 locality_month_count <- ggplot(bees, aes(x = month)) +
   geom_bar() +
   facet_wrap(~locality)
