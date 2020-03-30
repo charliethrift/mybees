@@ -1,0 +1,289 @@
+---
+title: "UCSBees Analysis 2020"
+author: "Charlie Thrift"
+date: "1/31/2020"
+output: html_document
+---
+##add mellitidae family??
+##change to be able to see significance of small values on plot 1
+##change the list on first plot, so that the legend isn't genus, its familyGenus
+##unwrapped can show more diversity
+##show distribution of halictidae on santa cruz island based on date
+##can add dayof year to density
+##see if we can combine the halictidae data with other halictidae data to see if the grouping of males and females is consistant, but also to see if there is more of a signal
+##see if there are differences in site genera time, like one site eucera is may, other site is june
+##going forward, thinking about presentations, thinking about what the driving questions are so that it can be presented to the audience
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load packages
+Here, I will load necessary packages.
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+```
+
+# Load data
+Here, I will load necessary data. This is all of the hymenoptera data 
+from CCBER gbif site
+```{r}
+data <- read.csv(file = "data/hymenopteradata04mar2020.csv")
+```
+
+# Filter data
+Here, I will pull only the UCSBees project data from all of the Hymenoptera.
+```{r}
+data <- filter(data, str_detect(recordedBy, pattern = "UCSBees"))
+```
+
+# Assign sites to the data
+Form 8 different standard sites for the collected specimen, based on Latitude and 
+Longitude from the data.
+```{r}
+#for North Campus Open Space 1 thru 8
+data$site[data$decimalLatitude == 34.4215 & 
+               data$decimalLongitude == -119.8827]<- "North Campus Open Space"
+data$site[data$decimalLatitude == 34.4213 & 
+               data$decimalLongitude == -119.8844]<- "North Campus Open Space"
+data$site[data$decimalLatitude == 34.4183 & 
+               data$decimalLongitude == -119.8776]<- "North Campus Open Space"
+data$site[data$decimalLatitude == 34.4191 & 
+               data$decimalLongitude == -119.8766]<- "North Campus Open Space"
+data$site[data$decimalLatitude == 34.4189 & 
+               data$decimalLongitude == -119.8799]<- "North Campus Open Space"
+data$site[data$decimalLatitude == 34.4189 & 
+               data$decimalLongitude == -119.8827]<- "North Campus Open Space"
+data$site[data$decimalLatitude == 34.4197 & 
+               data$decimalLongitude == -119.8818]<- "North Campus Open Space"
+data$site[data$decimalLatitude == 34.4188 & 
+               data$decimalLongitude == -119.8807]<- "North Campus Open Space"
+#for Coal Oil Point Reserve 1 thru 6
+data$site[data$decimalLatitude == 34.41238 & 
+               data$decimalLongitude == -119.88110]<- "Coal Oil Point Reserve"
+data$site[data$decimalLatitude == 34.41146 & 
+               data$decimalLongitude == -119.88210]<- "Coal Oil Point Reserve"
+data$site[data$decimalLatitude == 34.41276 & 
+               data$decimalLongitude == -119.88231]<- "Coal Oil Point Reserve"
+data$site[data$decimalLatitude == 34.41491 & 
+               data$decimalLongitude == -119.88020]<- "Coal Oil Point Reserve"
+data$site[data$decimalLatitude == 34.41733 & 
+               data$decimalLongitude == -119.87962]<- "Coal Oil Point Reserve"
+data$site[data$decimalLatitude == 34.40870 & 
+               data$decimalLongitude == -119.87859]<- "Coal Oil Point Reserve"
+#for North Parcel sites 1 thru 3
+data$site[data$decimalLatitude == 34.4226 & 
+               data$decimalLongitude == -119.8815]<- "North Parcel"
+data$site[data$decimalLatitude == 34.4235 & 
+               data$decimalLongitude == -119.8815]<- "North Parcel"
+data$site[data$decimalLatitude == 34.4224 & 
+               data$decimalLongitude == -119.8794]<- "North Parcel"
+#for Santa Cruz Island sites 1 thru 7
+data$site[data$decimalLatitude == 34.001056 & 
+               data$decimalLongitude == -119.686972]<- "Santa Cruz Island"
+data$site[data$decimalLatitude == 33.991972 & 
+               data$decimalLongitude == -119.689278]<- "Santa Cruz Island"
+data$site[data$decimalLatitude == 33.997278 & 
+               data$decimalLongitude == -119.714056]<- "Santa Cruz Island"
+data$site[data$decimalLatitude == 33.991056 & 
+               data$decimalLongitude == -119.719278]<- "Santa Cruz Island"
+data$site[data$decimalLatitude == 34.018889 & 
+               data$decimalLongitude == -119.871111]<- "Santa Cruz Island"
+data$site[data$decimalLatitude == 34.0225 & 
+               data$decimalLongitude == -119.876667]<- "Santa Cruz Island"
+data$site[data$decimalLatitude == 34.0175 & 
+               data$decimalLongitude == -119.682222]<- "Santa Cruz Island"
+#for CCBER Greenhouse sites 1 thru 2
+data$site[data$decimalLatitude == 34.420935 & 
+               data$decimalLongitude == -119.858054 ]<- "CCBER Greenhouse"
+data$site[data$decimalLatitude == 34.420828 & 
+               data$decimalLongitude == -119.858029 ]<- "CCBER Greenhouse"
+#for UCSB Lagoon sites 1 thru 5
+data$site[data$decimalLatitude == 34.407448 & 
+               data$decimalLongitude == -119.849818 ]<- "UCSB Lagoon"
+data$site[data$decimalLatitude == 34.40677 & 
+               data$decimalLongitude == -119.84716 ]<- "UCSB Lagoon"
+data$site[data$decimalLatitude == 34.407967 & 
+               data$decimalLongitude == -119.848322 ]<- "UCSB Lagoon"
+data$site[data$decimalLatitude == 34.408304 & 
+               data$decimalLongitude == -119.848728 ]<- "UCSB Lagoon"
+data$site[data$decimalLatitude == 34.40928 & 
+               data$decimalLongitude == -119.84892 ]<- "UCSB Lagoon"
+#for Santa Clara River sites 1 thru 8
+data$site[data$decimalLatitude == 34.363911 & 
+               data$decimalLongitude == -118.999505 ]<- "Santa Clara River"
+data$site[data$decimalLatitude == 34.363902 & 
+               data$decimalLongitude == -118.993442 ]<- "Santa Clara River"
+data$site[data$decimalLatitude == 34.389062 & 
+               data$decimalLongitude == -118.889657  ]<- "Santa Clara River"
+data$site[data$decimalLatitude == 34.388092 & 
+               data$decimalLongitude == -118.889530  ]<- "Santa Clara River"
+data$site[data$decimalLatitude == 34.389105 & 
+               data$decimalLongitude == -118.885348 ]<- "Santa Clara River"
+data$site[data$decimalLatitude == 34.355015 & 
+               data$decimalLongitude == -119.014507  ]<- "Santa Clara River"
+data$site[data$decimalLatitude == 34.390363 & 
+               data$decimalLongitude == -118.89511 ]<- "Santa Clara River"
+data$site[data$decimalLatitude == 34.387065 & 
+               data$decimalLongitude == -118.891438  ]<- "Santa Clara River"
+#for Carpinteria Salt Marsh sites 1 thru 4
+data$site[data$decimalLatitude == 34.0175 & 
+               data$decimalLongitude == -119.682222 ]<- "Carpinteria Salt Marsh Reserve"
+data$site[data$decimalLatitude == 34.40114 & 
+               data$decimalLongitude == -119.53040  ]<- "Carpinteria Salt Marsh Reserve"
+data$site[data$decimalLatitude == 34.39822 & 
+               data$decimalLongitude == -119.53040  ]<- "Carpinteria Salt Marsh Reserve"
+data$site[data$decimalLatitude == 34.39715 & 
+               data$decimalLongitude == -119.52728 ]<- "Carpinteria Salt Marsh Reserve"
+```
+
+# Subset the data and remove the non-bees
+Here, I will clean up the data by only using specific columns, and omitting others. Also, the non-bee bycatch from the UCSBees project are removed here.
+```{r}
+data <- data[,c("catalogNumber", "family", "genus", "species",
+                   "decimalLatitude", "decimalLongitude", "eventDate",
+                   "day", "month", "year", "identifiedBy", "sex", "startDayOfYear", "site", "fieldNumber")]
+data <- na.omit(data, cols="site") #remove rows that have NA as the site (because
+#if they don't have a site then their lat/long is not one of the standard collection sites)
+data <- data[data$family %in% c("Andrenidae", "Apidae", "Colletidae", 
+                                "Halictidae", "Megachilidae"), ]
+```
+
+# Plot the data
+Plot count per family at each individual site, with genus represented by color.
+```{r}
+count_persite_bygenus_wrap <- ggplot(data, aes(x=family)) +
+  geom_bar(aes(fill=genus)) + facet_wrap(~site) + 
+  theme(axis.text.x = element_text(angle = 90))
+count_persite_bygenus_wrap
+```
+
+# Plot 2: Families of bees over time
+Plot all the bees over one year. Scatterplot of counts of bees over time, with family represented by color.
+```{r}
+#count_overtime_byfamily <- ggplot(data, aes(x=month, y=number)) + 
+  #geom_point(aes(fill=family)) 
+#count_overtime_byfamily
+```
+
+# Plot 3: Density of the bees through the year
+Plot density of all bees through the year, and density through year per site.
+```{r}
+density_plot_all <- ggplot(data, aes(x=month)) + geom_density() 
+density_plot_all
+density_plot_all_byfamily <- ggplot(data, aes(x=month)) + geom_density(aes(color=family)) 
+density_plot_all_byfamily
+density_plot_all_byfamily_dayofyear <- ggplot(data, aes(x=startDayOfYear)) + geom_density(aes(color=family)) 
+density_plot_all_byfamily_dayofyear
+density_plot_facet <- ggplot(data, aes(x=month)) + geom_density() + facet_wrap(~site)
+density_plot_facet
+density_plot_facet_byfamily <- ggplot(data, aes(x=month)) + geom_density(aes(color=family)) +  facet_wrap(~site)
+density_plot_facet_byfamily
+```
+
+# Make a new column for month name, and then make monthName plot chronologically
+Use the "month" column value (1,2,3,...,12) to make "MonthName" column (Jan, Feb, Mar,...,Dec). Then, make monthName plot chronologically instead of alphabetically.
+```{r}
+#Make new column for the name of the month based on number
+data$monthName[data$month == 1]<- "Jan"
+data$monthName[data$month == 2]<- "Feb"
+data$monthName[data$month == 3]<- "Mar"
+data$monthName[data$month == 4]<- "Apr"
+data$monthName[data$month == 5]<- "May"
+data$monthName[data$month == 6]<- "Jun"
+data$monthName[data$month == 7]<- "Jul"
+data$monthName[data$month == 8]<- "Aug"
+data$monthName[data$month == 9]<- "Sep"
+data$monthName[data$month == 10]<- "Oct"
+data$monthName[data$month == 11]<- "Nov"
+data$monthName[data$month == 12]<- "Dec"
+
+#Make this new monthName column plot chronologically.
+data$monthName = factor(data$monthName, levels = month.abb)
+```
+
+# Clean the field numbers
+NCOS has both NCOS_7a and NCOS_07a, for example
+```{r}
+data$fieldNumber[data$fieldNumber == "NCOS_7a"]<- "NCOS_07a"
+data$fieldNumber[data$fieldNumber == "NCOS_7b"]<- "NCOS_07b"
+```
+
+
+# Check which months are missing data
+Scatterplot site by month. Each site should have a point for each month. If it doesn't, then that month's worth of data still needs to be processed. This does not account for all the data from a month. For example, if only half of the UCSB Lagoon bees were processed in January, it looks like they all have been.
+```{r}
+check_missingdata_sitebymonth <- ggplot(data, aes(x=monthName, y=site)) + geom_point()
+check_missingdata_sitebymonth
+check_missingdata_trapbymonth_wrapsite <- ggplot(data, aes(x=monthName, y=fieldNumber)) + geom_point() + facet_wrap(~site)
+check_missingdata_trapbymonth_wrapsite
+check_missingdata_byfieldNumber <- ggplot(data, aes(x=monthName, y=fieldNumber)) + geom_point()
+check_missingdata_byfieldNumber
+check_missingdata_byfieldNumber_withcolor <- ggplot(data, aes(x=monthName, y=fieldNumber)) + geom_point(aes(color=site))
+check_missingdata_byfieldNumber_withcolor
+```
+
+# Plot Halictidae family data over time by sex
+```{r}
+halictidaedata <- subset(data, family == "Halictidae")
+halictidaedata <- subset(halictidaedata, sex == "MALE" | sex == "FEMALE")
+halictidaebysex <- ggplot(halictidaedata, aes(x=month)) + geom_density(aes(color=sex))
+halictidaebysex
+halictidaebysex_occurence <- ggplot(halictidaedata, aes(x=monthName)) + geom_bar(aes(fill=sex), position=position_dodge())
+halictidaebysex_occurence
+```
+# Plot specific groups within Halictidae family over time by sex
+```{r}
+agapostemondata <- subset(halictidaedata, genus == "Agapostemon")
+agapostemonplot_bysex <- ggplot(agapostemondata, aes(x=monthName)) + 
+  geom_bar(aes(fill=sex), position=position_dodge()) + ggtitle("Agapostemon")
+agapostemonplot_bysex
+agapostemonplot_bysex_bysite <- ggplot(agapostemondata, aes(x=monthName)) + 
+  geom_bar(aes(fill=sex), position=position_dodge()) + ggtitle("Agapostemon") + facet_wrap(~site)
+agapostemonplot_bysex_bysite
+halictusdata <- subset(halictidaedata, genus == "Halictus")
+halictusplot_bysex <- ggplot(halictusdata, aes(x=monthName)) + 
+  geom_bar(aes(fill=sex), position=position_dodge()) + ggtitle("Halictus")
+halictusplot_bysex
+lasioglossumdata <- subset(halictidaedata, genus == "Lasioglossum")
+lasioglossumplot_bysex <- ggplot(lasioglossumdata, aes(x=monthName)) + 
+  geom_bar(aes(fill=sex), position=position_dodge()) + ggtitle("Lasioglossum")
+lasioglossumplot_bysex
+```
+# Plot all bees over time by sex
+```{r}
+allbees_bysex <- ggplot(data, aes(x=monthName)) + geom_bar(aes(fill=sex), 
+                                                               position=position_dodge())
+allbees_bysex
+allbees_bysex_density <- ggplot(data, aes(x=month)) + geom_density(aes(color=sex))
+allbees_bysex_density
+allbees_bysex_density_dayofyear <- ggplot(data, aes(x=startDayOfYear)) + geom_density(aes(color=sex))
+allbees_bysex_density_dayofyear
+```
+
+# Plot native versus nonnative bees over time
+```{r}
+# Make new column for native or nonnative value
+data$nativeStatus[data$species == "Apis mellifera"]<- "Nonnative"
+data$nativeStatus[data$species != "Apis mellifera"]<- "Native"
+nativestatusplot <- ggplot(data, aes(x=monthName)) +
+  geom_bar(aes(fill=nativeStatus), position=position_dodge()) 
+nativestatusplot
+nativestatusplot_bysite <- ggplot(data, aes(x=monthName)) +
+  geom_bar(aes(fill=nativeStatus), position=position_dodge()) + facet_wrap(~site)
+nativestatusplot_bysite
+nativestatusplot_density <- ggplot(data, aes(x=startDayOfYear)) + geom_density(aes(color=nativeStatus))
+nativestatusplot_density
+nativestatusplot_density_bysite <- ggplot(data, aes(x=startDayOfYear)) + geom_density(aes(color=nativeStatus)) + facet_wrap(~site)
+nativestatusplot_density_bysite
+```
+# Overall Abundance
+Plots of day of year versus overall abundance for all native bees, honey bees, Agapostemon bees, and Lasioglossum bees
+```{r}
+overallabundanceplot_nativebees <- ggplot(data, aes(monthName)) + geom_bar()
+overallabundanceplot_nativebees
+```
+
+
